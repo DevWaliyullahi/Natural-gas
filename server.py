@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import mimetypes
+import os
 import re
 import warnings
 from dataclasses import asdict, dataclass, field
@@ -3529,8 +3530,10 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    server = ThreadingHTTPServer(("127.0.0.1", 8765), Handler)
-    print("Transporter Intelligence running at http://127.0.0.1:8765")
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", "8765"))
+    server = ThreadingHTTPServer((host, port), Handler)
+    print(f"Transporter Intelligence running at http://{host}:{port}")
     server.serve_forever()
 
 

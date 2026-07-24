@@ -125,7 +125,6 @@ const ADMIN_NAV = [
   {view:"dashboard",      icon:"layout-dashboard",    label:"Dashboard"},
   {view:"transportation", icon:"activity",            label:"Transportation"},
   {view:"dgdr",           icon:"target",              label:"DGDR / DGDO"},
-  {view:"linepack",       icon:"gauge",               label:"Nomination & Line-Pack"},
   {view:"utilization",    icon:"pie-chart",           label:"Sector Utilisation"},
   {view:"exceptions",     icon:"triangle-alert",      label:"Potential Incidents"},
   {view:"escalations",    icon:"message-circle",      label:"Escalations"},
@@ -147,7 +146,8 @@ const TRANSPORTER_NAV = [
   {accordion:"workspace",icon:"layout-dashboard", label:"Workspace"},
   {view:"dashboard",icon:"layout-dashboard",      label:"Dashboard",       parent:"workspace"},
   {view:"uploads",  icon:"upload-cloud",           label:"Upload & Reports",parent:"workspace"},
-  {view:"knowledge",icon:"library",                label:"Knowledge Base", parent:"workspace"},
+  {group:"Operations"},
+  {view:"cases",    icon:"folder-open",            label:"Case Management"},
   {group:"Account"},
   {view:"profile",  icon:"user",                   label:"Profile"},
 ];
@@ -156,7 +156,7 @@ const GASCO_NAV = [
   {group:"Operations"},
   {view:"dashboard",   icon:"layout-dashboard", label:"Dashboard"},
   {view:"nomination",  icon:"clipboard-list",   label:"Nomination & Quality"},
-  {view:"knowledge",   icon:"library",          label:"Knowledge Base"},
+  {view:"cases",       icon:"folder-open",      label:"Case Management"},
   {group:"Account"},
   {view:"profile",     icon:"user",             label:"Profile"},
 ];
@@ -164,14 +164,19 @@ const GASCO_NAV = [
 const VIEWER_NAV = [
   {group:"Operations"},
   {view:"dashboard",   icon:"layout-dashboard", label:"Dashboard"},
-  {view:"knowledge",   icon:"library",          label:"Knowledge Base"},
+  {view:"cases",       icon:"folder-open",      label:"Case Management"},
+  {group:"Registry"},
+  {view:"suppliers",   icon:"factory",          label:"Gas Suppliers"},
+  {view:"shippers",    icon:"ship",             label:"Shippers"},
+  {view:"customers",   icon:"building-2",       label:"Offtakers"},
 ];
 
 const SHIPPER_NAV = [
   {group:"Operations"},
   {view:"dashboard",       icon:"layout-dashboard", label:"Dashboard"},
   {view:"shipperNomination",icon:"clipboard-list",  label:"My Nominations"},
-  {view:"knowledge",       icon:"library",          label:"Knowledge Base"},
+  {view:"uploads",         icon:"upload-cloud",     label:"Upload Data"},
+  {view:"cases",           icon:"folder-open",      label:"Case Management"},
   {group:"Account"},
   {view:"profile",         icon:"user",             label:"Profile"},
 ];
@@ -638,7 +643,7 @@ function reportsFilterBar(){
   </div>`;
 }
 
-const INCIDENT_CATEGORIES=[["threshold","Threshold Breaches"],["missing","Missing Submissions"],["volume","Volume Omissions"],["masterdata","Master Data Issues"],["rollup","Roll-up Mismatches"],["quality","Off-Spec Gas Quality"]];
+const INCIDENT_CATEGORIES=[["threshold","Threshold Breaches"],["missing","Missing Submissions"],["volume","Volume Omissions"],["masterdata","Master Data Issues"],["rollup","Roll-up Mismatches"],["quality","Off-Spec Gas Quality"],["nomination","Nomination Variance"]];
 
 function incidentsFilterRow(counts){
   const cur=state.subView||"threshold";
@@ -675,24 +680,14 @@ function customersFilterBar(){
 }
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
-function renderAdminDashboard(){
-  const selectedYear=_activeFilters._year||"2026";
-  const useSynthetic=selectedYear!=="2026";
-  const dailySeries=useSynthetic?synthDailySeriesForYear(selectedYear):(state.report?.dailySeries||[]);
-  const k=useSynthetic?synthKpisFromSeries(dailySeries):state.report.kpis;
-  const subs=state.report.uploads;
-  const accepted=subs.filter(s=>s.status==="ACCEPTED"||s.status==="ACCEPTED_WITH_WARNINGS").length;
+function dashboardBodyHTML(dailySeries,k,subs,accepted){
   const mlfPct=k.totalInjection?((k.totalMlfLoss/k.totalInjection)*100):0;
-  const monthlySeries=aggregateSeriesMonthly(dailySeries);
-  $("#pageContent").innerHTML=`
-    ${pageHeader("Operations Dashboard","Daily submission overview, transport performance, demand tracking, imbalance monitoring, and regulatory exceptions.")}
-    ${populationNotifyBanner()}
-    ${timeFilterBar()}
+  return `
     <section class="kpi-grid-6">
       ${metricCard("Total Injection",fmt(k.totalInjection),"MMScf","arrow-up-right","transportation",dailySeries)}
       ${metricCard("Effective Attribution",fmt(k.effectiveAttribution),"MMScf","activity","transportation",dailySeries)}
       ${metricCard("Shrinkage",fmt(k.totalShrinkage),"MMScf","sliders-horizontal","transportation",dailySeries)}
-      ${metricCard("Imbalance",fmt(k.totalImbalance),"MMScf","scale","linepack",dailySeries)}
+      ${metricCard("Imbalance",fmt(k.totalImbalance),"MMScf","scale","exceptions",dailySeries)}
       ${metricCard("MLF",`${fmt(mlfPct)}%`,"% loss","percent","transportation",dailySeries)}
       ${metricCard("Potential Incidents",fmt(k.exceptions),`${k.errors} critical`,"triangle-alert","exceptions",dailySeries)}
     </section>
@@ -717,26 +712,51 @@ function renderAdminDashboard(){
       ${sectorUtilizationCard()}
     </section>
     <section class="dashboard-two-col">
-      ${linePackGaugeCard()}
       ${criticalExceptionsCard()}
+      ${submissionComplianceCard(subs,accepted)}
     </section>
     <section class="dashboard-two-col">
-      ${submissionComplianceCard(subs,accepted)}
       ${aiActionCards()}
+      ${dgdrMiniCard()}
     </section>
     <section class="dashboard-two-col dashboard-continuation">
-      ${dgdrMiniCard()}
       ${injectionBreakdownCard()}
-      <article class="card chart-card">
-        <div class="card-title"><h2>Weekly Market Trend</h2><button class="mini-btn" data-view-target="transportation">View report</button></div>
-        ${renderTrendChartSVG(monthlySeries,[["injection","var(--green-dark)","Injection"],["effectiveAttribution","#58b96b","Effective attribution"]],{mode:"bar",W:720,H:200,pX:36,pT:12,pB:28,labelEvery:1})}
-        <div class="chart-legend"><span><span class="legend-dot" style="background:var(--green-dark)"></span>Injection</span><span><span class="legend-dot" style="background:#58b96b"></span>Effective attribution</span></div>
-      </article>
       ${offtakerDeliveryCard()}
       ${transporterPopulationStatusCard()}
       ${escalationTrackerCard()}
     </section>
     ${dashboardFooterStats(subs,accepted)}`;
+}
+
+function renderAdminDashboard(){
+  const selectedYear=_activeFilters._year||"2026";
+  const useSynthetic=selectedYear!=="2026";
+  const dailySeries=useSynthetic?synthDailySeriesForYear(selectedYear):(state.report?.dailySeries||[]);
+  const k=useSynthetic?synthKpisFromSeries(dailySeries):state.report.kpis;
+  const subs=state.report.uploads;
+  const accepted=subs.filter(s=>s.status==="ACCEPTED"||s.status==="ACCEPTED_WITH_WARNINGS").length;
+  $("#pageContent").innerHTML=`
+    ${pageHeader("Operations Dashboard","Daily submission overview, transport performance, demand tracking, imbalance monitoring, and regulatory exceptions.")}
+    ${populationNotifyBanner()}
+    ${timeFilterBar()}
+    ${dashboardBodyHTML(dailySeries,k,subs,accepted)}`;
+}
+
+// ─── Scoped dashboard (transporter/shipper — same layout as admin, own data only) ──
+async function renderScopedDashboard(reportFilters,title,desc,subsFilterFn){
+  const prevReport=state.report;
+  const scoped=await fetchReport(reportFilters);
+  state.report=scoped;
+  const dailySeries=scoped.dailySeries||[];
+  const k=scoped.kpis;
+  const subs=subsFilterFn?(scoped.uploads||[]).filter(subsFilterFn):(scoped.uploads||[]);
+  const accepted=subs.filter(s=>s.status==="ACCEPTED"||s.status==="ACCEPTED_WITH_WARNINGS").length;
+  $("#pageContent").innerHTML=`
+    ${pageHeader(title,desc)}
+    ${timeFilterBar()}
+    ${dashboardBodyHTML(dailySeries,k,subs,accepted)}`;
+  renderIcons();
+  state.report=prevReport;
 }
 
 const METRIC_BAR_COLORS={
@@ -869,33 +889,6 @@ function criticalExceptionsCard(){
       </div>`:""}
     </div>
   </article>`;
-}
-
-function linePackGaugeCard(){
-  const net=state.report.networkLinePackIndicator||{status:"SAFE",variancePct:0,thresholdPct:5.5};
-  const exc=state.report.exceptions||[];
-  const nomFlags=exc.filter(f=>f.rule==="NOMINATION_VARIANCE").length;
-  const lpFlags=exc.filter(f=>f.rule==="LINE_PACK_VARIANCE").length;
-  const pct=Math.min(100,(Math.abs(net.variancePct)/(net.thresholdPct||5.5))*100);
-  const statusClass=net.status==="CRITICAL"?"critical":net.status==="WARNING"?"warning":"safe";
-  const color=net.status==="CRITICAL"?"var(--red)":net.status==="WARNING"?"#2f6fed":"var(--green)";
-  return `<article class="card report-card">
-    <div class="card-title"><h2>Line-Pack Indicator</h2><span>Injection vs. effective offtake variance</span></div>
-    ${gaugeChart(pct,color,`${fmt(Math.abs(net.variancePct))}%`,"Variance")}
-    <div class="gauge-status-box status-${statusClass}"><i data-lucide="triangle-alert"></i><div><strong>Status: ${net.status}</strong><span>${nomFlags} nomination flags &bull; ${lpFlags} line-pack flags</span></div></div>
-    <button class="report-link" data-view-target="linepack">View line-pack report <i data-lucide="arrow-right"></i></button>
-  </article>`;
-}
-
-function gaugeChart(pct,color,valueText,label){
-  const R=42,C=2*Math.PI*R,dash=(Math.max(pct,0)/100)*C;
-  return `<div class="gauge-wrap">
-    <svg viewBox="0 0 120 120">
-      <circle cx="60" cy="60" r="${R}" fill="none" stroke="#e5ebe6" stroke-width="11"/>
-      <circle cx="60" cy="60" r="${R}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 60 60)"/>
-    </svg>
-    <div class="gauge-center"><strong>${valueText}</strong><span>${label}</span></div>
-  </div>`;
 }
 
 function submissionComplianceCard(subs,accepted){
@@ -1135,40 +1128,15 @@ function colorForIndex(i){
   return palette[i%palette.length];
 }
 
-// ─── Nomination & Line-Pack Monitor ─────────────────────────────────────────────
-function renderLinePackPage(){
-  const cfg=state.bootstrap?.monitoringConfig||{nominationVariancePct:3,linePackVariancePct:3};
+// ─── Nomination variance (folded into Potential Incidents) ─────────────────────
+function renderNominationIncidentTab(){
+  const cfg=state.bootstrap?.monitoringConfig||{nominationVariancePct:3};
   const exc=state.report.exceptions||[];
   const nomFlags=exc.filter(f=>f.rule==="NOMINATION_VARIANCE");
-  const lpFlags=exc.filter(f=>f.rule==="LINE_PACK_VARIANCE");
-  const lpStatus=state.report.linePackStatus||[];
-  const pipelines=state.report.pipelineLinePack||[];
-  $("#pageContent").innerHTML=`
-    ${pageHeader("Nomination & Line-Pack Monitor","Daily nomination variance, line-pack indicator, and theoretical line-pack for major pipelines.")}
-    ${timeFilterBar()}
-    <section class="dashboard-main-row">
-      <article class="card">
-        <div class="card-title"><h2>Nomination Variance</h2><span>Band: ±${cfg.nominationVariancePct}% of daily nomination</span></div>
-        <p class="muted" style="font-size:12.5px">Shippers whose linked supplier/GASCO delivery falls outside the agreed nomination band are flagged for query and possible escalation.</p>
-        <div class="table-wrap"><table class="mini-table"><thead><tr><th>Date</th><th>Shipper</th><th>Linked Supplier / GASCO</th><th>Message</th><th></th></tr></thead>
-        <tbody>${nomFlags.slice(0,12).map(f=>`<tr><td>${f.affected_date||""}</td><td>${esc(f.shipper||f.supplier||f.supplier_id||"")}</td><td>${esc(f.gasSupplier||f.supplier||"")}</td><td>${esc(f.message)}</td><td>${f.escalationId?`<span class="escalation-stage-badge stage-${f.escalationStage?.toLowerCase()}">${f.escalationStage}</span>`:`<button class="mini-btn escalate-btn" data-escalate-flag="${f.id}">Escalate</button>`}</td></tr>`).join("")||`<tr><td colspan="5"><div class="empty">No nomination breaches for the active filters.</div></td></tr>`}</tbody></table></div>
-      </article>
-      <article class="card">
-        <div class="card-title"><h2>Line-Pack Indicator</h2><span>Band: ±${cfg.linePackVariancePct}% of injection vs. uptake</span></div>
-        <p class="muted" style="font-size:12.5px">Flags when the gap between total injection and total offtake exceeds the agreed network margin, then exposes contributing shipper rows for investigation.</p>
-        <div class="table-wrap"><table class="mini-table"><thead><tr><th>Shipper</th><th>Linked Supplier</th><th>Latest Date</th><th>Injection</th><th>Uptake</th><th>Variance</th></tr></thead>
-        <tbody>${lpStatus.map(r=>`<tr class="${r.breach?"row-warn":""}"><td>${esc(r.shipper||r.supplier)}</td><td>${esc(r.supplier)}</td><td>${r.date}</td><td>${fmt(r.injection)}</td><td>${fmt(r.uptake)}</td><td>${r.variancePct>0?"+":""}${fmt(r.variancePct)}%</td></tr>`).join("")||`<tr><td colspan="6"><div class="empty">No data.</div></td></tr>`}</tbody></table></div>
-      </article>
-    </section>
-    <h3 class="section-subhead">Theoretical Line-Pack — Major Pipelines</h3>
-    <section class="card">
-      <p class="muted" style="font-size:12.5px">Indicative estimates only, based on published pipeline diameter/length and an assumed representative operating pressure. Confirm against actual SCADA pressure and pipe geometry before using these figures for line-pack monitoring thresholds.</p>
-      <div class="table-wrap"><table><thead><tr><th>Pipeline</th><th>Diameter</th><th>Length</th><th>Assumed Operating Pressure</th><th>Nameplate Capacity</th><th>Theoretical Line-Pack</th><th>≈ Hours of Capacity</th></tr></thead>
-      <tbody>${pipelines.map(p=>`<tr>
-        <td>${esc(p.name)}</td><td>${p.diameterIn}"</td><td>${p.lengthKm} km</td><td>${p.assumedOperatingPressurePsig} psig</td>
-        <td>${fmt(p.capacityMmscfd)} MMScfd</td><td>${fmt(p.theoreticalLinePackMmscf)} MMScf</td><td>${p.hoursOfNameplateCapacity?fmt(p.hoursOfNameplateCapacity)+" hrs":"—"}</td>
-      </tr>`).join("")}</tbody></table></div>
-    </section>`;
+  return `<div class="card-title"><h2>Nomination Variance</h2><span>${nomFlags.length} potential incident(s)</span></div>
+  <p style="color:var(--muted);margin:0 0 16px">Shippers whose linked supplier/GASCO delivery falls outside the agreed nomination band (±${cfg.nominationVariancePct}% of daily nomination) are flagged for query and possible escalation.</p>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Shipper</th><th>Linked Supplier / GASCO</th><th>Message</th><th></th></tr></thead>
+  <tbody>${nomFlags.map(f=>`<tr><td>${f.affected_date||""}</td><td>${esc(f.shipper||f.supplier||f.supplier_id||"")}</td><td>${esc(f.gasSupplier||f.supplier||"")}</td><td>${esc(f.message)}</td><td>${f.escalationId?`<span class="escalation-stage-badge stage-${f.escalationStage?.toLowerCase()}">${f.escalationStage}</span>`:`<button class="mini-btn escalate-btn" data-escalate-flag="${f.id}">Escalate</button>`}</td></tr>`).join("")||`<tr><td colspan="5"><div class="empty">No nomination breaches for the active filters.</div></td></tr>`}</tbody></table></div>`;
 }
 
 // ─── Utilization Performance ─────────────────────────────────────────────────
@@ -1257,12 +1225,11 @@ function renderReportsPage(){
     ["offtakers","Offtakers"],
     ["dgdr","DGDR"],
     ["dgdo","DGDO"],
-    ["linepack","Line-Pack"],
     ["escalations","Escalations"],
     ["submissions","Submissions"],
   ];
   $("#pageContent").innerHTML=`
-    ${pageHeader("Reports","Drill into transport performance, shippers, offtakers, DGDR, DGDO, line-pack, and escalation records.",
+    ${pageHeader("Reports","Drill into transport performance, shippers, offtakers, DGDR, DGDO, and escalation records.",
       `<button class="outline-btn" id="exportTable"><i data-lucide="download"></i> Export CSV</button>`)}
     ${reportsFilterBar()}
     <div class="report-tabs">
@@ -1278,7 +1245,6 @@ function renderReportTab(tab){
   if(tab==="offtakers")return renderReportOfftakers();
   if(tab==="dgdr")return renderDgdrReportTable();
   if(tab==="dgdo")return renderDgdoReportTable();
-  if(tab==="linepack")return renderLinePackReportTable();
   if(tab==="escalations")return renderEscalationReportTable();
   if(tab==="submissions")return renderReportSubmissions();
   return "";
@@ -1347,14 +1313,6 @@ function renderDgdoReportTable(){
   return `<div class="card-title"><h2>DGDO Report</h2><span>Supplier / GASCO delivery obligation</span></div>
   <div class="table-wrap"><table><thead><tr><th>Gas Supplier / GASCO</th><th>DGDO Target</th><th>Actual Injection</th><th>Shortfall / Variance</th><th>Status</th><th></th></tr></thead>
   <tbody>${rows.map(r=>`<tr><td>${esc(r.gasSupplier)}</td><td>${fmt(r.dgdoTarget)}</td><td>${fmt(r.dgdoActual)}</td><td>${fmt(Math.abs(r.dgdoVariancePct||0))}%</td><td><span class="status-chip ${r.dgdoVariancePct<-3?"under":r.dgdoVariancePct>3?"over":"within"}">${r.dgdoVariancePct<-3?"Under":r.dgdoVariancePct>3?"Over":"Within"}</span></td><td><button class="drill-link" data-drill-supplier="${r.supplierId}">Detail →</button></td></tr>`).join("")}</tbody></table></div>`;
-}
-
-function renderLinePackReportTable(){
-  const net=state.report.networkLinePackIndicator||{};
-  const rows=state.report.linePackStatus||[];
-  return `<div class="card-title"><h2>Line-Pack & Balance Report</h2><span>Network status: ${net.status||"SAFE"} · ${fmt(net.variancePct)}%</span></div>
-  <div class="table-wrap"><table><thead><tr><th>Shipper</th><th>Supplier / GASCO</th><th>Latest Date</th><th>Injection</th><th>Effective Offtake</th><th>Variance</th><th>Status</th></tr></thead>
-  <tbody>${rows.map(r=>`<tr class="${r.breach?"row-warn":""}"><td>${esc(r.shipper||r.supplier)}</td><td>${esc(r.supplier)}</td><td>${r.date}</td><td>${fmt(r.injection)}</td><td>${fmt(r.uptake)}</td><td>${r.variancePct>0?"+":""}${fmt(r.variancePct)}%</td><td><span class="status-chip ${r.breach?"under":"within"}">${r.breach?"Review":"Within"}</span></td></tr>`).join("")}</tbody></table></div>`;
 }
 
 function renderEscalationReportTable(){
@@ -1494,7 +1452,8 @@ function renderExceptionsPage(){
   const masterData=all.filter(f=>["UNKNOWN_CUSTOMER","UNKNOWN_SUPPLIER","SUPPLIER_SHEET_NOT_FOUND"].includes(f.rule));
   const rollup=all.filter(f=>f.rule==="ATTRIBUTION_EXCEEDS_EFFECTIVE_INJECTION");
   const quality=all.filter(f=>f.rule==="OFF_SPEC_GAS");
-  const counts={threshold:threshold.length,missing:missing.length,volume:volume.length,masterdata:masterData.length,rollup:rollup.length,quality:quality.length};
+  const nomination=all.filter(f=>f.rule==="NOMINATION_VARIANCE");
+  const counts={threshold:threshold.length,missing:missing.length,volume:volume.length,masterdata:masterData.length,rollup:rollup.length,quality:quality.length,nomination:nomination.length};
   $("#pageContent").innerHTML=`
     ${pageHeader("Potential Incidents","Six-category potential-incident command centre, with AI consequence-management recommendations and regulatory citations.")}
     ${incidentsFilterRow(counts)}
@@ -1505,6 +1464,7 @@ function renderExceptionsPage(){
       ${tab==="masterdata"?renderExceptionList(masterData,"Master Data Issues","Unrecognised suppliers, customers, or entry points."):""}
       ${tab==="rollup"?renderExceptionList(rollup,"Roll-up Mismatches","Total customer attribution exceeds effective injection."):""}
       ${tab==="quality"?renderExceptionList(quality,"Off-Spec Gas Quality","Gas quality/lab reports from suppliers that fall outside the agreed specification."):""}
+      ${tab==="nomination"?renderNominationIncidentTab():""}
     </article>`;
 }
 
@@ -1744,10 +1704,11 @@ async function renderCasesPage(){
   const closed=cases.filter(c=>c.status==="RESOLVED"||c.status==="CLOSED");
   const statuses=[{id:"OPEN",label:"Open"},{id:"IN_PROGRESS",label:"In Progress"},{id:"RESOLVED",label:"Resolved"},{id:"CLOSED",label:"Closed"}];
   const viewMode=state.caseViewMode||"card";
+  const canLog=state.auth?.role==="shipper"||state.auth?.role==="gasco"||state.auth?.role==="transporter";
 
   $("#pageContent").innerHTML=`
     ${pageHeader("Case Management","Complaints and enquiries logged from shippers, suppliers, offtakers, transporters, or the public.",
-      `<button class="primary-btn" data-open-log-case><i data-lucide="plus"></i> Log Complaint</button>`)}
+      canLog?`<button class="primary-btn" data-open-log-case><i data-lucide="plus"></i> Log Complaint</button>`:"")}
     <div class="escalation-toolbar">
       <div class="report-tabs" style="margin:0">
         <button class="tab ${!state.caseStatusFilter?"active":""}" data-case-status-filter="">All (${all.length})</button>
@@ -1761,7 +1722,7 @@ async function renderCasesPage(){
     <h3 class="section-subhead">Open Cases</h3>
     ${open.length
       ?(viewMode==="card"?`<section class="escalation-grid">${open.map(caseCompactCard).join("")}</section>`:caseListTable(open))
-      :`<div class="empty">No open cases. Use Log Complaint to record one.</div>`}
+      :`<div class="empty">No open cases.${canLog?" Use Log Complaint to record one.":""}</div>`}
     ${closed.length?`<h3 class="section-subhead">Resolved / Closed</h3>${viewMode==="card"?`<section class="escalation-grid">${closed.map(caseCompactCard).join("")}</section>`:caseListTable(closed)}`:""}`;
   renderIcons();
 }
@@ -1809,6 +1770,7 @@ async function submitLogCase(event){
 function openCaseDetailModal(caseId){
   const c=(state.cases||[]).find(x=>x.id===caseId);if(!c)return;
   const isOpen=c.status!=="RESOLVED"&&c.status!=="CLOSED";
+  const canAct=state.auth?.role!=="admin"&&state.auth?.role!=="viewer";
   const relatedBits=[
     c.relatedSupplierName?`<span><strong>Supplier:</strong> ${esc(c.relatedSupplierName)}</span>`:"",
     c.relatedCustomerName?`<span><strong>Offtaker:</strong> ${esc(c.relatedCustomerName)}</span>`:"",
@@ -1831,7 +1793,7 @@ function openCaseDetailModal(caseId){
     </div>
     ${c.attachment_file_name?`<p style="margin:10px 0"><a class="esc-card-view" href="/api/cases/${c.id}/attachment" download><i data-lucide="paperclip"></i> ${esc(c.attachment_file_name)}</a></p>`:""}
     <div class="escalation-notes" style="margin-top:14px">${c.notes.map(n=>`<div class="escalation-note"><strong>${esc(n.author)}</strong> <span class="muted">· ${n.action}</span><p>${esc(n.text)}</p></div>`).join("")||`<p class="muted" style="font-size:12.5px">No notes yet.</p>`}</div>
-    ${isOpen?`
+    ${isOpen&&canAct?`
     <div class="escalation-actions">
       <input type="text" class="escalation-note-input" data-case-note-for="${c.id}" placeholder="Add a note…"/>
       <div class="escalation-btn-row" style="flex-wrap:wrap">
@@ -1842,7 +1804,7 @@ function openCaseDetailModal(caseId){
         <button class="outline-btn" data-case-action="resolve" data-case-id="${c.id}" style="min-height:34px;font-size:13px">Resolve</button>
         <button class="outline-btn" data-case-action="close" data-case-id="${c.id}" style="min-height:34px;font-size:13px">Close</button>
       </div>
-    </div>`:`<button class="mini-btn" style="margin-top:10px" data-case-action="reopen" data-case-id="${c.id}">Reopen</button>`}
+    </div>`:!isOpen&&canAct?`<button class="mini-btn" style="margin-top:10px" data-case-action="reopen" data-case-id="${c.id}">Reopen</button>`:""}
   `;
   $("#caseDetailModal").classList.add("open");$("#caseDetailModal").setAttribute("aria-hidden","false");
   renderIcons();
@@ -2220,38 +2182,38 @@ function sendAiMessage(question){
 }
 
 // ─── Transporter workspace ────────────────────────────────────────────────────
-function renderTransporterDashboard(){
+async function renderTransporterDashboard(){
   const tid=state.auth?.transporterId;
-  const myUploads=state.report.uploads.filter(u=>!tid||u.transporter_id===tid);
-  const k=state.report.kpis;
-  const accepted=myUploads.filter(s=>s.status==="ACCEPTED"||s.status==="ACCEPTED_WITH_WARNINGS").length;
-  const myPop=(state.populationStatus||[]).find(r=>r.transporterId===tid);
-  $("#pageContent").innerHTML=`
-    ${pageHeader("My Dashboard",`Welcome back, ${state.auth?.name||"Transporter User"}.`,
-      `<button class="primary-btn" data-open-daily-entry="true"><i data-lucide="edit-3"></i> Daily Data Entry</button>
-       <button class="outline-btn" data-open-upload="true"><i data-lucide="upload"></i> Upload Workbook</button>`)}
-    ${timeFilterBar()}
-    ${myPop?`<div class="population-notify-banner ${myPop.status==="GREEN"?"population-ok-banner":""}"><i data-lucide="${myPop.status==="GREEN"?"check-circle":"bell-ring"}"></i> Today's data (${myPop.date}) is <strong>${myPop.populated?"populated":"not yet populated"}</strong> on the regulator's daily status board.</div>`:""}
-    <section class="kpi-grid-5" style="grid-template-columns:repeat(4,1fr)">
-      ${kpiCard("My Submissions",myUploads.length,"total uploads",true,"file-spreadsheet")}
-      ${kpiCard("Accepted",accepted,"validated",false,"check-circle")}
-      ${kpiCard("Potential Incidents",fmt(k.exceptions),`${k.errors} critical`,false,"triangle-alert","exceptions")}
-      ${kpiCard("Active Suppliers",fmt(k.activeSuppliers),"in window",false,"factory")}
-    </section>
-    <section class="dashboard-main-row">
-      <article class="card chart-card">
-        <div class="card-title"><h2>Flow Trend</h2><span>Last 7 days (rolling) — transporter view is limited to a 1-week trend</span></div>
-        <div class="flow-chart-wrap">${flowChart((state.report?.dailySeries||[]).slice(-7))}</div>
-      </article>
-      <article class="card">
-        <div class="card-title"><h2>Recent Submissions</h2><button class="mini-btn" data-view-target="uploads">View All</button></div>
-        <div class="queue-list">${myUploads.slice(0,5).map(r=>`
-          <div class="queue-item"><span class="queue-icon"><i data-lucide="file-spreadsheet"></i></span>
-            <span><strong>${r.supplier}</strong><small>${fmtStatus(r.status)} · ${r.period}${r.upload_source_type==="DIRECT_ENTRY"?" · Direct entry":""}</small></span>
-          </div>`).join("")||`<div class="empty">No submissions yet.</div>`}
-        </div>
-      </article>
-    </section>`;
+  await renderScopedDashboard(
+    {transporter:tid},
+    "My Dashboard",
+    `Welcome back, ${state.auth?.name||"Transporter User"} — your submissions, transport performance, and exceptions for ${transporterNetworkName(tid)}.`,
+    u=>!tid||u.transporter_id===tid
+  );
+  const actionsHost=document.querySelector("#pageContent .hero-actions");
+  if(actionsHost&&!actionsHost.querySelector("[data-open-daily-entry]")){
+    actionsHost.insertAdjacentHTML("afterbegin",`<button class="primary-btn" data-open-daily-entry="true"><i data-lucide="edit-3"></i> Daily Data Entry</button>
+       <button class="outline-btn" data-open-upload="true"><i data-lucide="upload"></i> Upload Workbook</button>`);
+    renderIcons();
+  }
+}
+
+async function renderShipperDashboard(){
+  const shipperId=state.auth?.shipperId;
+  const linkedSupplierId=(state.bootstrap.shippers||[]).find(s=>s.id===shipperId)?.linkedSupplierId;
+  const linkedName=(state.bootstrap.shippers||[]).find(s=>s.id===shipperId)?.linkedSupplier||"your linked supplier";
+  await renderScopedDashboard(
+    {supplier:linkedSupplierId},
+    "My Dashboard",
+    `Welcome back, ${state.auth?.name||"Shipper User"} — transport performance and exceptions for ${linkedName}.`,
+    u=>!linkedSupplierId||u.supplier_id===linkedSupplierId
+  );
+  const actionsHost=document.querySelector("#pageContent .hero-actions");
+  if(actionsHost&&!actionsHost.querySelector("[data-open-shipper-nomination]")){
+    actionsHost.insertAdjacentHTML("afterbegin",`<button class="primary-btn" data-open-shipper-nomination><i data-lucide="clipboard-list"></i> Log Nomination</button>
+       <button class="outline-btn" data-open-upload="true"><i data-lucide="upload"></i> Upload Workbook</button>`);
+    renderIcons();
+  }
 }
 
 function renderTransporterDrilldown(){
@@ -2355,10 +2317,18 @@ function renderProfilePage(){
 
 function renderUploadsPage(isTransporter=false){
   const uploads=state.report.uploads;
-  const filtered=isTransporter&&state.auth?.transporterId?uploads.filter(u=>u.transporter_id===state.auth.transporterId):uploads;
+  const role=state.auth?.role;
+  let filtered=uploads;
+  if(role==="transporter"&&state.auth?.transporterId){
+    filtered=uploads.filter(u=>u.transporter_id===state.auth.transporterId);
+  }else if(role==="shipper"){
+    const linkedSupplierId=(state.bootstrap.shippers||[]).find(s=>s.id===state.auth?.shipperId)?.linkedSupplierId;
+    filtered=linkedSupplierId?uploads.filter(u=>u.supplier_id===linkedSupplierId):uploads;
+  }
+  const scoped=role==="transporter"||role==="shipper";
   $("#pageContent").innerHTML=`
-    ${pageHeader(isTransporter?"Upload & Reports":"Upload History",
-      isTransporter?"Submit workbooks and review your validation outcomes.":"All transporter submissions.",
+    ${pageHeader(scoped?"Upload & Reports":"Upload History",
+      scoped?"Submit workbooks and review your validation outcomes.":"All transporter submissions.",
       `<button class="primary-btn" data-open-upload="true"><i data-lucide="upload"></i> Upload Workbook</button>`)}
     <section class="card registry-card">
       <div class="card-title"><h2>Submissions</h2><span>${filtered.length} records</span></div>
@@ -2392,16 +2362,17 @@ function renderApp(){
   const v=state.view,role=state.auth.role,isViewer=role==="viewer",isAdmin=role==="admin"||isViewer;
   if(isAdmin){
     if(v==="dashboard")isViewer?renderLimitedDashboard():renderAdminDashboard();
-    else if(isViewer&&v==="knowledge")renderKnowledgePage();
+    else if(v==="cases")renderCasesPage();
+    else if(isViewer&&v==="suppliers")renderRegistryPage("suppliers");
+    else if(isViewer&&v==="shippers")renderRegistryPage("shippers");
+    else if(isViewer&&v==="customers")renderRegistryPage("customers");
     else if(isViewer)renderLimitedDashboard();
     else if(v==="transportation")renderReportsPage();
     else if(v==="reports")renderReportsPage();
     else if(v==="dgdr")renderDgdrPage();
-    else if(v==="linepack")renderLinePackPage();
     else if(v==="utilization")renderUtilizationPage();
     else if(v==="exceptions")renderExceptionsPage();
     else if(v==="escalations")renderEscalationsPage();
-    else if(v==="cases")renderCasesPage();
     else if(v==="knowledge")renderKnowledgePage();
     else if(v==="ai")renderAiPage();
     else if(v==="transporters")renderRegistryPage("transporters");
@@ -2415,19 +2386,20 @@ function renderApp(){
   }else if(role==="gasco"){
     if(v==="dashboard")renderLimitedDashboard();
     else if(v==="nomination")renderGascoNominationPage();
-    else if(v==="knowledge")renderKnowledgePage();
+    else if(v==="cases")renderCasesPage();
     else if(v==="profile")renderProfilePage();
     else renderLimitedDashboard();
   }else if(role==="shipper"){
-    if(v==="dashboard")renderLimitedDashboard();
+    if(v==="dashboard")renderShipperDashboard();
     else if(v==="shipperNomination")renderShipperNominationPage();
-    else if(v==="knowledge")renderKnowledgePage();
+    else if(v==="uploads")renderUploadsPage(true);
+    else if(v==="cases")renderCasesPage();
     else if(v==="profile")renderProfilePage();
-    else renderLimitedDashboard();
+    else renderShipperDashboard();
   }else{
     if(v==="dashboard")renderTransporterDashboard();
     else if(v==="uploads")renderUploadsPage(true);
-    else if(v==="knowledge")renderKnowledgePage();
+    else if(v==="cases")renderCasesPage();
     else if(v==="profile")renderProfilePage();
     else renderTransporterDashboard();
   }
@@ -2853,7 +2825,7 @@ function bindEvents(){
 
     // Sub-view tabs
     const svEl=e.target.closest("[data-sub-view]");
-    if(svEl){state.subView=svEl.dataset.subView;if(state.view==="reports")renderReportsPage();else if(state.view==="exceptions")renderExceptionsPage();renderIcons();return;}
+    if(svEl){state.subView=svEl.dataset.subView;if(state.view==="reports"||state.view==="transportation")renderReportsPage();else if(state.view==="exceptions")renderExceptionsPage();renderIcons();return;}
     const utilModeEl=e.target.closest("[data-util-mode]");
     if(utilModeEl){
       state.utilizationMode=utilModeEl.dataset.utilMode;
