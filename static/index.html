@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transporter Intelligence</title>
+    <link rel="stylesheet" href="/styles.css?v=eagle-1" />
+    <script src="/icons.js" defer></script>
+    <script src="/app.js?v=eagle-1" defer></script>
+  </head>
+  <body>
+
+    <!-- ═══════════════════════════════════════════════════════
+         PUBLIC SITE  (homepage + login) — hidden after login
+    ═══════════════════════════════════════════════════════ -->
+    <div id="publicSite">
+
+      <!-- Homepage — NCELAS-style layout -->
+      <div id="homeView">
+
+        <!-- Top navigation -->
+        <nav class="ncelas-nav">
+          <div class="ncelas-brand">
+            <span class="ncelas-logo-icon"><i data-lucide="activity"></i></span>
+            <div class="ncelas-brand-text">
+              <span class="ncelas-brand-title">NMDPRA</span>
+              <span class="ncelas-brand-sub">Transporter Intelligence</span>
+            </div>
+          </div>
+          <ul class="ncelas-nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#faq">FAQs</a></li>
+            <li><a href="mailto:operations@transporter.ai">Contact Us</a></li>
+          </ul>
+          <div class="ncelas-nav-actions">
+            <button class="ncelas-login-link" id="goLogin">Login</button>
+            <button class="ncelas-create-btn" id="heroGetStarted">Create Account</button>
+          </div>
+        </nav>
+
+        <!-- Hero — petrochemical-plant.jpg background -->
+        <section class="ncelas-hero" id="home">
+          <div class="ncelas-hero-overlay">
+            <h1>NIGERIAN DOMESTIC GAS<br>TRANSPORTATION INTELLIGENCE<br>PLATFORM</h1>
+            <div class="ncelas-slide-dots">
+              <span class="slide-dot active"></span>
+              <span class="slide-dot"></span>
+              <span class="slide-dot"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Who We Are -->
+        <section class="ncelas-about" id="about">
+          <div class="ncelas-about-img">
+            <img src="/petrochemical-plant.jpg" alt="Gas processing facility" />
+          </div>
+          <div class="ncelas-about-text">
+            <span class="ncelas-eyebrow">LITTLE ABOUT</span>
+            <h2>Who We Are</h2>
+            <p>Transporter Intelligence is an electronic platform established under the Nigerian Gas Transportation Network Code (NGTNC) for the efficient oversight of NGIC transportation submissions, NEA compliance, shipper accountability, and offtaker attribution reporting across Nigeria's domestic gas network.</p>
+            <p>The platform centralises data from all licensed pipeline operators and enables regulators to monitor injection volumes, exceptions, and compliance scores in real time.</p>
+            <button class="ncelas-learn-btn" id="ctaGetStarted">Login Now &rarr;</button>
+          </div>
+        </section>
+
+        <!-- Services -->
+        <section class="ncelas-services" id="services">
+          <div class="ncelas-services-left">
+            <span class="ncelas-eyebrow">WHAT WE DO</span>
+            <h2>NMDPRA Services</h2>
+            <p>NMDPRA has the statutory responsibility of ensuring compliance to petroleum laws, regulations and guidelines in the Oil and Gas Industry.</p>
+          </div>
+          <div class="ncelas-services-cards">
+            <div class="ncelas-service-card">
+              <img src="/Oil-Refinery-Twilight1.jpg" alt="Issuance" />
+              <span class="ncelas-service-tag">SUBMISSION</span>
+              <h3>Data Submission</h3>
+              <p>Issuance and management of NGIC transportation submissions covering injection volumes, offtaker attributions, and imbalance records under the NC regime.</p>
+            </div>
+            <div class="ncelas-service-card">
+              <img src="/petrochemical-plant.jpg" alt="Compliance" />
+              <span class="ncelas-service-tag">COMPLIANCE</span>
+              <h3>Compliance Monitoring</h3>
+              <p>Real-time compliance scoring, exception detection, and threshold breach alerts across all pipeline operators and supplier GASCOs.</p>
+            </div>
+            <div class="ncelas-service-card">
+              <img src="/Oil-Refinery-Twilight1.jpg" alt="Reporting" />
+              <span class="ncelas-service-tag">REPORTING</span>
+              <h3>Regulatory Reporting</h3>
+              <p>Multi-view reporting by shipper, gas supplier/GASCO, offtaker, sector, and exception workflow with full audit trail, daily series charts, and export capabilities.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="ncelas-faq" id="faq">
+          <h2>FAQ</h2>
+          <div class="ncelas-faq-grid">
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>What is the Nigerian Gas Transportation Network Code (NGTNC)?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">The NGTNC is a regulatory framework governing the technical, commercial, and operational arrangements for natural gas transportation across Nigeria's pipeline network, administered by NMDPRA.</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>What documents are required for gas transportation submissions?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">NGIC operator submissions use the approved NGNR GASCO Data Template in .xlsx or .xlsm format covering daily injection volumes, offtaker attributions, pressure readings, and condensate drop-out records.</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>Who can access Transporter Intelligence?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">The platform supports Admin (NMDPRA / NGIC regulatory staff with full access) and Transporter roles (pipeline operators scoped to their own submissions and data).</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>How are exceptions and threshold breaches handled?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">All uploaded records are validated against configurable threshold rules (pressure, condensate, imbalance). Breaches are surfaced in the Alerts &amp; Exceptions command centre, categorised into five exception types.</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>Can transporter users see other operators' data?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">No. Transporter accounts are strictly scoped to their own submissions and supplier assignments. Admin accounts have unrestricted platform-wide visibility.</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>How do I access user support?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">Contact the NMDPRA platform support team at operations@transporter.ai or through the Contact Us page. For technical issues, include your transporter code and submission reference.</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>What pipelines does this platform apply to?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">The platform applies to all NGTNC-covered pipelines including NGIC, GASLINK, CHGC, SNG, and Accugas networks across the Western, Eastern, and South-South regions.</div>
+            </div>
+            <div class="ncelas-faq-item">
+              <button class="ncelas-faq-q"><span>How are operational imbalances addressed?</span><i data-lucide="plus"></i></button>
+              <div class="ncelas-faq-a">Imbalances between nominated and attributed volumes are flagged automatically against the configured band (default ±2 MMScf). Persistent imbalances trigger escalation through the Alerts &amp; Exceptions workflow.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="ncelas-footer">
+          <div class="ncelas-footer-inner">
+            <div class="ncelas-footer-brand">
+              <div class="ncelas-footer-logo">
+                <span class="ncelas-logo-icon small"><i data-lucide="activity"></i></span>
+              </div>
+              <p class="ncelas-footer-name">NIGERIAN MIDSTREAM AND<br>DOWNSTREAM PETROLEUM<br>REGULATORY AUTHORITY (NMDPRA)</p>
+              <p class="ncelas-footer-desc">To ensure the sustainable development of Nigeria's Oil and Gas resources across the value chain for our stakeholders through effective regulation, while entrenching world class professionalism, accountability, and transparency.</p>
+            </div>
+            <div class="ncelas-footer-links">
+              <h4>Useful links</h4>
+              <ul>
+                <li><a href="#">NMDPRA</a></li>
+                <li><a href="#">NGC</a></li>
+                <li><a href="#">ELPS</a></li>
+                <li><a href="#">WAGP</a></li>
+                <li><a href="mailto:operations@transporter.ai">Enquiry</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="ncelas-footer-copy">
+            &copy; 2026 Nigerian Midstream and Downstream Petroleum Regulatory Authority. All rights reserved.
+          </div>
+        </footer>
+
+      </div><!-- /#homeView -->
+
+      <!-- Login page — oil refinery background -->
+      <div id="loginView" style="display:none">
+        <div class="ncelas-login-page">
+          <div class="ncelas-login-card">
+            <h2>Login</h2>
+            <p class="ncelas-login-sub">Welcome back, please login to your account.</p>
+
+            <!-- Demo selector (subtle helper) -->
+            <div class="demo-accounts">
+              <select id="demoSelect" class="ncelas-demo-select">
+                <option value="">— Quick demo login —</option>
+              </select>
+            </div>
+
+            <div class="ncelas-input-group">
+              <i data-lucide="mail"></i>
+              <input id="loginEmail" type="email" placeholder="Email Address" />
+            </div>
+            <div class="ncelas-input-group">
+              <i data-lucide="lock"></i>
+              <input id="loginPassword" type="password" placeholder="Password" />
+            </div>
+
+            <div class="ncelas-remember-row">
+              <label class="ncelas-remember"><input type="checkbox" id="rememberMe"> Remember me</label>
+            </div>
+
+            <button class="ncelas-login-btn-main" id="loginBtn">Login</button>
+
+            <div class="ncelas-login-links-row">
+              <button class="ncelas-text-link" id="backToHome">Back to home</button>
+              <a href="#" class="ncelas-text-link">Forgot Password?</a>
+            </div>
+
+            <div class="login-divider"><span>OR</span></div>
+
+            <button class="ms-btn" id="msLoginBtn">
+              <svg width="20" height="20" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+              Sign in with Microsoft
+            </button>
+
+            <div id="loginError" class="login-error" style="display:none"></div>
+          </div>
+        </div>
+      </div><!-- /#loginView -->
+
+    </div><!-- /#publicSite -->
+
+
+    <!-- ═══════════════════════════════════════════════════════
+         APP SHELL — shown after login
+    ═══════════════════════════════════════════════════════ -->
+    <div class="shell" id="appShell" style="display:none">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark"><i data-lucide="activity"></i></span>
+          <span>Transporter IQ</span>
+        </div>
+        <nav class="nav" id="mainNav"><!-- populated by JS --></nav>
+        <div class="source-card">
+          <i data-lucide="database"></i>
+          <strong>Registry ready</strong>
+          <span>Shippers, suppliers, offtakers, and points seeded.</span>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div class="search">
+            <i data-lucide="search"></i>
+            <input id="globalSearch" placeholder="Search supplier, shipper, offtaker, point…" />
+            <kbd>⌘ F</kbd>
+          </div>
+          <div class="top-actions">
+            <div class="notif-wrap" style="position:relative">
+              <button class="icon-btn" id="notifBell" title="Notifications"><i data-lucide="bell"></i></button>
+              <div class="notif-dropdown" id="notifDropdown" style="display:none"></div>
+            </div>
+            <div class="profile">
+              <div class="avatar" id="userAvatar">TI</div>
+              <div>
+                <strong id="userName">User</strong>
+                <span id="userEmail">user@transporter.ai</span>
+              </div>
+            </div>
+            <button class="outline-btn logout-btn" id="logoutBtn"><i data-lucide="log-out"></i> Sign Out</button>
+          </div>
+        </header>
+        <section id="pageContent"></section>
+      </main>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════════════
+         OVERLAYS — always in DOM
+    ═══════════════════════════════════════════════════════ -->
+
+    <aside class="filter-drawer" id="filterDrawer" aria-hidden="true">
+      <div class="drawer-head">
+        <div><span class="eyebrow">AND filters</span><h2>Refine reports</h2></div>
+        <button class="icon-btn" id="closeFilters"><i data-lucide="x"></i></button>
+      </div>
+      <div class="filters-grid drawer-filters">
+        <label>Gas Supplier / GASCO<select id="supplierFilter"></select></label>
+        <label>Offtaker<select id="customerFilter"></select></label>
+        <label>Sector<select id="sectorFilter"></select></label>
+        <label>Transporter<select id="transporterFilter"></select></label>
+        <label>Entry Point<select id="entryFilter"></select></label>
+        <label>Exit Point<select id="exitFilter"></select></label>
+        <label>Exception<select id="exceptionFilter"></select></label>
+        <label>Severity<select id="severityFilter"></select></label>
+        <label>Start Date<input id="startDate" type="date" /></label>
+        <label>End Date<input id="endDate" type="date" /></label>
+      </div>
+      <button class="primary-btn full-btn" id="applyFilters">Apply Filters</button>
+      <button class="outline-btn full-btn" id="resetFilters">Reset Filters</button>
+    </aside>
+
+    <div class="modal" id="uploadModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Import NGIC Workbook</h2><p>Linked supplier/GASCO and period are detected automatically from the workbook.</p></div>
+          <button class="icon-btn" id="closeUpload"><i data-lucide="x"></i></button>
+        </div>
+        <form id="uploadForm" class="upload-form upload-form-simple">
+          <label class="file-drop">
+            <input id="workbookFile" name="file" type="file" accept=".xlsx,.xlsm" required />
+            <i data-lucide="file-spreadsheet"></i>
+            <span>Drop workbook here or click to browse</span>
+            <strong id="fileName">No file selected</strong>
+          </label>
+          <p class="upload-hint">NGIC operator context, linked supplier/GASCO, and period are detected automatically from the workbook.</p>
+          <button class="primary-btn" type="submit"><i data-lucide="upload"></i> Process Upload</button>
+        </form>
+        <div id="uploadResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <aside class="drawer" id="insightDrawer" aria-hidden="true">
+      <div class="drawer-head">
+        <div><span class="eyebrow">AI evidence</span><h2 id="drawerTitle">Insight</h2></div>
+        <button class="icon-btn" id="closeDrawer"><i data-lucide="x"></i></button>
+      </div>
+      <p id="drawerSummary"></p>
+      <div id="drawerEvidence" class="evidence-grid"></div>
+      <div class="drawer-action"><strong>Suggested action</strong><p id="drawerAction"></p></div>
+    </aside>
+
+    <div class="modal" id="entityModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2 id="entityModalTitle">Add record</h2><p id="entityModalHint">Create master data used by uploads and reports.</p></div>
+          <button class="icon-btn" id="closeEntityModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="entityForm" class="entity-form"></form>
+        <div id="entityResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <!-- Potential Incident detail modal -->
+    <div class="modal" id="incidentModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Potential Incident</h2><p>AI Consequence Management finding, regulatory basis, and escalation.</p></div>
+          <button class="icon-btn" id="closeIncidentModal"><i data-lucide="x"></i></button>
+        </div>
+        <div id="incidentModalBody"></div>
+      </div>
+    </div>
+
+    <!-- Escalation detail modal -->
+    <div class="modal" id="escalationModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Escalation Case</h2><p>Full finding, audit trail, and workflow actions.</p></div>
+          <button class="icon-btn" id="closeEscalationModal"><i data-lucide="x"></i></button>
+        </div>
+        <div id="escalationModalBody"></div>
+      </div>
+    </div>
+
+    <!-- Escalation report — formal letter modal -->
+    <div class="modal" id="letterModal" aria-hidden="true">
+      <div class="modal-card modal-card-wide">
+        <div class="modal-head">
+          <div><h2>Escalation Report — Formal Letter</h2><p>Auto-generated by the AI Consequence Management engine. Download as Word or PDF.</p></div>
+          <button class="icon-btn" id="closeLetterModal"><i data-lucide="x"></i></button>
+        </div>
+        <div id="letterModalBody"></div>
+      </div>
+    </div>
+
+    <!-- Large chart modal -->
+    <div class="modal" id="chartModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2 id="chartModalTitle">Chart</h2></div>
+          <button class="icon-btn" id="closeChartModal"><i data-lucide="x"></i></button>
+        </div>
+        <div id="chartModalBody"></div>
+      </div>
+    </div>
+
+    <!-- Transporter direct daily data-entry modal -->
+    <div class="modal" id="dailyEntryModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Daily Data Entry</h2><p>Enter today's figures directly instead of uploading a workbook.</p></div>
+          <button class="icon-btn" id="closeDailyEntryModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="dailyEntryForm" class="entity-form"></form>
+        <div id="dailyEntryResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <!-- Gasco/supplier daily nomination + quality modal -->
+    <div class="modal" id="nominationModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Daily Nomination &amp; Quality Report</h2><p>Previous day's volume, injection, gas quality, and today's projection.</p></div>
+          <button class="icon-btn" id="closeNominationModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="nominationForm" class="entity-form"></form>
+        <div id="nominationResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <!-- Knowledge Base — upload document modal -->
+    <div class="modal" id="knowledgeUploadModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Upload Document</h2><p>Add a policy, regulation, SOP, circular, or reference template to the shared Knowledge Base.</p></div>
+          <button class="icon-btn" id="closeKnowledgeUploadModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="knowledgeUploadForm" class="entity-form"></form>
+        <div id="knowledgeUploadResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <!-- Case Management — log complaint modal -->
+    <div class="modal" id="logCaseModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Log Complaint</h2><p>Record a complaint or enquiry received from a shipper, supplier, offtaker, transporter, or the public.</p></div>
+          <button class="icon-btn" id="closeLogCaseModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="logCaseForm" class="entity-form"></form>
+        <div id="logCaseResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <!-- Case Management — case detail modal -->
+    <div class="modal" id="caseDetailModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Case Detail</h2><p>Full complaint record, audit trail, and workflow actions.</p></div>
+          <button class="icon-btn" id="closeCaseDetailModal"><i data-lucide="x"></i></button>
+        </div>
+        <div id="caseDetailModalBody"></div>
+      </div>
+    </div>
+
+    <!-- Shipper self-reported nomination modal -->
+    <div class="modal" id="shipperNominationModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Log Nomination</h2><p>Record the volume you nominated for a gas day, directly or with a supporting file.</p></div>
+          <button class="icon-btn" id="closeShipperNominationModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="shipperNominationForm" class="entity-form"></form>
+        <div id="shipperNominationResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal" id="addUserModal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-head">
+          <div><h2>Add User</h2><p>Create a new platform account and optionally send an invitation.</p></div>
+          <button class="icon-btn" id="closeAddUserModal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="addUserForm" class="entity-form">
+          <label>First Name <input name="firstName" type="text" required placeholder="First name"/></label>
+          <label>Last Name <input name="lastName" type="text" required placeholder="Last name"/></label>
+          <label>Email Address <input name="email" type="email" required placeholder="user@domain.com"/></label>
+          <label>User Type
+            <select name="userType" required>
+              <option value="">Select user type</option>
+              <option value="super_admin">Super Admin</option>
+              <option value="platform_user">Platform User</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </label>
+          <label class="ncelas-remember" style="gap:10px;flex-direction:row;align-items:center;text-transform:none;font-weight:500;font-size:15px">
+            <input type="checkbox" name="invite"> Invite to login (send email invitation)
+          </label>
+          <button class="primary-btn full-btn" type="submit"><i data-lucide="user-plus"></i> Add User</button>
+        </form>
+        <div id="addUserResult" class="upload-result"></div>
+      </div>
+    </div>
+
+    <div class="chart-tooltip" id="chartTooltip" role="tooltip"></div>
+
+    <button class="chat-launcher" id="chatLauncher"><i data-lucide="message-circle"></i><span>AI</span></button>
+    <aside class="chat-panel" id="chatPanel" aria-hidden="true">
+      <div class="chat-head">
+        <div>
+          <span class="eyebrow">Transporter AI</span>
+          <h2>Ask about this data</h2>
+          <p class="chat-context" id="chatContext"></p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="icon-btn" id="expandChat" title="Full screen"><i data-lucide="maximize-2"></i></button>
+          <button class="icon-btn" id="closeChat"><i data-lucide="x"></i></button>
+        </div>
+      </div>
+      <div class="prompt-grid" id="promptGrid"></div>
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chat-compose">
+        <input id="chatInput" placeholder="Ask a question…" />
+        <button id="sendChat"><i data-lucide="send"></i></button>
+      </div>
+    </aside>
+
+  </body>
+</html>
